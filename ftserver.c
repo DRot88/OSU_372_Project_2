@@ -71,6 +71,17 @@ int main(int argc, char *argv[]) {
     }
 
 // Accept Connections from clients
+  while(1) {
+    clientLen = sizeof(clientAddress); // Get the size of the address for the client that will connect
+    // printf("About to establish a connection\n");
+    newConnectFD = accept(serverFD, (struct sockaddr *)&clientAddress, &clientLen); // Accept
+    // printf("FD Accepted\n");
+    if (newConnectFD < 0) {
+      fprintf(stderr, "ERROR on accept");   
+    }
+  }
 
+// close serverFD before exiting
+  close(serverFD); 
   return 0;
 }
