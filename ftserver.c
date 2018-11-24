@@ -21,6 +21,10 @@
 
 #define BUF_SIZE 50000
 
+// Function Declarations:
+
+void portValidation(int port);
+
 int main(int argc, char *argv[]) {
   
 // set up file descriptors (listen on serverFD, new connection will be on newFD)
@@ -54,6 +58,9 @@ int main(int argc, char *argv[]) {
 // Store the Port Number
   portNum = atoi(argv[1]);
 
+// Test for valid port number, exit if error
+  portValidation(portNum);
+
 // Initialize Socket
   serverAddress.sin_family = AF_INET; // Create a network-capable socket
   serverAddress.sin_port = htons(portNum); // Store the port number
@@ -84,4 +91,12 @@ int main(int argc, char *argv[]) {
 // close serverFD before exiting
   close(serverFD); 
   return 0;
+}
+
+void portValidation(int port) {
+  if ((port > 65535 || port < 1024)) {
+    fprintf(stderr, "ERROR: Port Number is Invalid. Please use a port in the range 1024-65535.\n");
+    exit(1);
+  }
+  return;
 }
