@@ -1,6 +1,7 @@
 // Program: ftserver.c
 // Author: Daniel Rotenberg
 // Class: OSU 372 - Project # 2
+// Description: This program is the server side of a file transfer system written in c 
 
 // References: 
 // Beej's Guide to Network Programming (https://beej.us/guide/bgnet/html/multi/index.html)

@@ -1,6 +1,7 @@
 # Program: ftserver.c
 # Author: Daniel Rotenberg
 # Class: OSU 372 - Project # 2
+# Description: This program is the client side of a file transfer system written in python 
 
 # References: https://docs.python.org/release/2.6.5/library/socketserver.html
 
@@ -17,7 +18,7 @@ def argValidation():
 
 def portValidation(portNum):
   if (int(portNum) > 65535 or (portNum) < 1024):
-    print("ERROR: Port Number is invalid. Please use a port in the range 1024-65535.\n")
+    print("ERROR: Port Number is invalid. Please use a port in the range 1024-65535.")
     exit(1)
 
 def commandValidation(com):
@@ -26,7 +27,7 @@ def commandValidation(com):
     exit(1)
 
 if __name__ == "__main__":
-  print ("Arg Count: %d"  % len(sys.argv))
+  # print ("Arg Count: %d"  % len(sys.argv))
   argValidation()
 
   try:
@@ -40,12 +41,22 @@ if __name__ == "__main__":
 
     if (len(sys.argv) == 6): # set filename/data_port based on arg count
       FILENAME = sys.argv[4]
-      DATA_PORT = sys.argv[5]
+      try:
+        DATA_PORT = int(sys.argv[5])
+      except:
+        print("ERROR: Data Port needs to be an integer in the range 1024-65535")
+        exit(1)
+      portValidation(DATA_PORT)
       # print ("Filename: %s" % FILENAME)
       # print ("Data_Port: %s" % DATA_PORT)
     elif (len(sys.argv) == 5):
-      DATA_PORT = sys.argv[4]
+      try:
+        DATA_PORT = int(sys.argv[4])
+      except:
+        print("ERROR: Data Port needs to be an integer in the range 1024-65535")
+        exit(1)
       # print ("Data_Port: %s" % DATA_PORT)
+      portValidation(DATA_PORT)
 
     cSocket = socket(AF_INET,SOCK_STREAM) # Create a socket (SOCK_STREAM means a TCP socket)
     cSocket.connect((HOST, PORT)) # connect to port
