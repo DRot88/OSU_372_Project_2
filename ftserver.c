@@ -17,6 +17,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <fcntl.h>
 #include <arpa/inet.h>
 #include <sys/wait.h>
 #include <signal.h>
@@ -129,13 +130,13 @@ int main(int argc, char *argv[]) {
       fprintf(stderr, "ERROR on accept");   
     }
 
-    // char* connected = "Connection Established";
     char COMMAND[600];
     char FILENAME[600];
     char DATA_PORT[600];
     char HOST[600];
     int charsRead;
     char messageToSend[BUF_SIZE];
+    char * completed = "completed";
 
     memset(HOST, 0, sizeof(HOST)); //Make sure to clear before send
     memset(COMMAND, 0, sizeof(COMMAND)); //Make sure to clear before send
@@ -165,9 +166,8 @@ int main(int argc, char *argv[]) {
           // fflush(stdout);
           sleep(1);
         }
-        char * completed = "completed";
         sleep(1);
-        send(newConnectFD, completed, strlen(completed), 0);  
+        send(newConnectFD, completed, strlen(completed), 0);  // send completed message to stop listing files
         complete = 0;
       }
       sleep(1);
@@ -198,19 +198,46 @@ int main(int argc, char *argv[]) {
         // printf("FILENAME: %s, filesList[i]: %s\n", FILENAME, filesList[i]);
         // fflush(stdout);   
         if (strcmp(FILENAME, filesList[i]) == 0) {
-          printf("File Found!");
+          printf("File Found!\n");
           fflush(stdout);
           found = 1;
           break;   
         }
       }
 
-      if (found == 0) {
-        printf("File not found!");
+      if (found == 0) { // let client know that file doesn't exist
+        char* notFound = "File Not Found!";
+        printf("File not found!\n");
         fflush(stdout);
+        send(newConnectFD, notFound, strlen(notFound), 0);
       }
 
+      if (found == 1) { // if found, send file to client
 
+        char fileBuffer[600];
+        memset(fileBuffer, 0, sizeof(fileBuffer));
+        int fd = open(FILENAME, O_RDONLY);
+        int totalBytesInFile = read(fd, fileBuffer, sizeof(fileBuffer) - 1);
+        // printf("Total Bytes: %d\n", totalBytesInFile); // test statement for how many bytes
+        // fflush(stdout);
+        // exit(1);
+
+        int moreBytesToSend = 1;
+        void* location = fileBuffer; // to keep track of location in file
+        while (moreBytesToSend) { // while there is still data to send, keep looping
+          int written = send(newConnectFD, location, sizeof(location), 0);
+          totalBytesInFile -= written; // decrement total bytes written from total
+          location += written; //update location in file
+
+          if(totalBytesInFile <= 0) { // no more data to send
+            moreBytesToSend = 0; // to break out of loop
+            memset(fileBuffer, 0, sizeof(fileBuffer));
+            sleep(1);
+            send(newConnectFD, completed, strlen(completed), 0);  // send completed message to end file transfer
+          }
+        }
+
+      }
     }    
 
     // printf("After If\n");

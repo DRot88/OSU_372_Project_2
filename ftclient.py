@@ -29,6 +29,7 @@ def commandValidation(com):
 
 if __name__ == "__main__":
   # print ("Arg Count: %d"  % len(sys.argv))
+  time.sleep(1)
   argValidation()
 
   try:
@@ -90,6 +91,18 @@ if __name__ == "__main__":
       cSocket.send(str(HOST))
       time.sleep(1)
       cSocket.send(str(FILENAME))
+      time.sleep(1)
+
+      
+      fileBuffer = cSocket.recv(100)
+      if (fileBuffer == "File Not Found!"):
+        print("Server Message: " + fileBuffer)
+        exit(1)
+      fileToWrite = open("New " + FILENAME, "w")
+      while fileBuffer != "completed":
+        fileToWrite.write(fileBuffer)
+        fileBuffer = cSocket.recv(100)
+
       # serverResponse = cSocket.recv(1024)
       # print (serverResponse)      
     # print "Sent: %s" % data
