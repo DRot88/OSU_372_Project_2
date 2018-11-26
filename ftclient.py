@@ -10,6 +10,7 @@
 
 from socket import *
 import sys
+import time
 
 def argValidation():
   if len(sys.argv) < 5:  # Make sure correct number of arguments
@@ -62,7 +63,35 @@ if __name__ == "__main__":
     cSocket.connect((HOST, PORT)) # connect to port
     # print "Connection Successful"
     # data = "Hello Server!"
-    # cSocket.send(data) #test statement
+
+    print("Command: %s" % COMMAND.lower())
+    if (COMMAND.lower() == "-l"):
+      cSocket.send("l")
+      cSocket.send(str(DATA_PORT))
+      time.sleep(1)
+      cSocket.send(str(HOST))
+
+      itemInFileList = cSocket.recv(100)
+        # while we havent reached the end
+      while itemInFileList != "completed":
+          # continue printing
+        print itemInFileList
+        # print "\n"
+        itemInFileList = cSocket.recv(100)
+
+
+
+      # print (serverResponse)
+
+    if (COMMAND.lower() == "-g"):
+      cSocket.send("g")
+      cSocket.send(str(DATA_PORT))
+      time.sleep(1)
+      cSocket.send(str(HOST))
+      time.sleep(1)
+      cSocket.send(str(FILENAME))
+      # serverResponse = cSocket.recv(1024)
+      # print (serverResponse)      
     # print "Sent: %s" % data
   except KeyboardInterrupt:
     print ("\nKeyboard Interrupt: Exiting Chat")
